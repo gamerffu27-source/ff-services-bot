@@ -1,9 +1,11 @@
-
 import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler
 
 ADMIN = "https://t.me/sahilffcreater"
+PROOF_CHANNEL = "https://t.me/ffcreatersahil"
+QR_FILE = "IMG_20261106_081245.jpg"
+
 
 async def start(update: Update, context):
     keyboard = [
@@ -25,40 +27,58 @@ async def start(update: Update, context):
         reply_markup=InlineKeyboardMarkup(keyboard)
     )
 
+
 async def buttons(update: Update, context):
     query = update.callback_query
     await query.answer()
 
-    messages = {
-        "service": "🔥 FF SERVICES\n\nGaming information and general support ke liye admin se contact karein.",
-        "price": "💰 PRICE LIST\n\nLatest price details ke liye admin se contact karein.",
-        "proof": "📢 PROOF CHANNEL\n\nProof channel link jald add hoga."
-    }
+    if query.data == "service":
+        await query.message.reply_text(
+            "🔥 FF SERVICES\n\n"
+            "Gaming information and general support ke liye admin se contact karein."
+        )
 
-    if query.data == "payment":
+    elif query.data == "price":
+        await query.message.reply_text(
+            "💰 PRICE LIST\n\n"
+            "1. Site Registered Problem Fix — ₹399\n"
+            "2. Gmail Bind Change / Unbind — ₹499"
+        )
+
+    elif query.data == "proof":
+        await query.message.reply_text(
+            "📢 PROOF CHANNEL\n\n"
+            "Join our channel for updates and proofs 👇\n"
+            + PROOF_CHANNEL
+        )
+
+    elif query.data == "payment":
         try:
-            with open("payment_qr.png", "rb") as photo:
+            with open(QR_FILE, "rb") as photo:
                 await query.message.reply_photo(
                     photo=photo,
-                    caption="💳 PAYMENT QR\n\nPayment se pehle admin se details confirm karein."
+                    caption="💳 PAYMENT QR\n\nPayment details admin se confirm karein."
                 )
         except FileNotFoundError:
-            await query.message.reply_text("Payment QR abhi available nahi hai.")
-    else:
-        await query.message.reply_text(messages[query.data])
+            await query.message.reply_text(
+                "Payment QR abhi available nahi hai."
+            )
+
 
 def main():
     token = os.environ.get("BOT_TOKEN")
+
     if not token:
         raise ValueError("BOT_TOKEN secret is missing!")
 
     app = Application.builder().token(token).build()
+
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(buttons))
 
     print("Bot is running!")
     app.run_polling()
 
+
 if __name__ == "__main__":
     main()
-
